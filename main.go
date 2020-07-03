@@ -23,7 +23,7 @@ func main() {
 	controller := controllers.Controller{}
 	r.HandleFunc("/signup", controller.Signup(db)).Methods("POST")
 	r.HandleFunc("/login", controller.Login(db)).Methods("POST")
-	r.HandleFunc("/protected", controller.TokeVerifierMiddleWare(controllers.ProtectedEndPoint)).Methods("GET")
+	r.HandleFunc("/protected", controller.TokeVerifierMiddleWare(controller.ProtectedEndPoint())).Methods("GET")
 	log.Println("listening on port 7000")
 	log.Fatal(http.ListenAndServe(":7000", r))
 }

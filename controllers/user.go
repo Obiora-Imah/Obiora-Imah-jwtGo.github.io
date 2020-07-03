@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"JWTAPIGO/models"
+	userRepository "JWTAPIGO/repository/user"
 	"JWTAPIGO/utils"
 	"database/sql"
 	"encoding/json"
@@ -49,9 +50,9 @@ func signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.Password = string(hash)
+	userRepo := userRepository.UserRepository{}
+	user = userRepo.Signup(db, user)
 
-	stmt := "insert into users(email, password) values($1, $2) returning id;"
-	err = db.QueryRow(stmt, user.Email, user.Password).Scan(&user.ID)
 	if err != nil {
 		msg := fmt.Sprint(err)
 		utils.RespondError(msg, w, http.StatusInternalServerError)
@@ -76,8 +77,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	password := user.Password
-	rows := db.QueryRow("select * from users where email = $1;", user.Email)
-	err := rows.Scan(&user.ID, &user.Email, &user.Password)
+	userRepo := userRepository.UserRepository{}
+	user, err := userRepo.Login(db, user)
 	if err != nil {
 		utils.RespondError("Wrong Email or Password", w, http.StatusBadRequest)
 		return
